@@ -12,8 +12,8 @@
       --frameStrokeOuter: #c1c2c4;
       --frameStrokeInner: #dcdcdf;
       --frameStrokeGlow: #b2b2b9;
-      --screenBg: #000000;
-      --homeBar: rgba(255, 255, 255, 0.64);
+      --screenBg: #ffffff;
+      --homeBar: #000000;
     }
 
     @media (prefers-color-scheme: light) {
@@ -24,7 +24,7 @@
         --frameStrokeOuter: #c1c2c4;
         --frameStrokeInner: #d0d0d6;
         --frameStrokeGlow: #b2b2b9;
-        --screenBg: #000000;
+        --screenBg: #ffffff;
       }
     }
 
@@ -149,13 +149,9 @@
       height: 100%;
       border: 0;
       display: block;
-      background: #000;
+      background: #fff;
       scrollbar-width: none;
       -ms-overflow-style: none;
-    }
-
-    iframe::-webkit-scrollbar {
-      display: none;
     }
   </style>
 </head>
@@ -231,39 +227,39 @@
       <svg class="overlaySvg" viewBox="0 0 427 881" fill="none" xmlns="http://www.w3.org/2000/svg"
         preserveAspectRatio="xMidYMid meet">
         <!-- Status bar: Time -->
-        <text id="statusTime" x="72" y="55" fill="white" font-size="17" font-weight="600"
+        <text id="statusTime" x="72" y="55" fill="black" font-size="17" font-weight="600"
           font-family="system-ui, -apple-system, 'SF Pro Text', Segoe UI, Roboto, sans-serif"
           letter-spacing="-0.2">9:41</text>
 
         <!-- Cellular signal bars -->
         <g opacity="0.88">
-          <rect x="297" y="49" width="3.4" height="5" rx="0.6" fill="white"></rect>
-          <rect x="302" y="47" width="3.4" height="7" rx="0.6" fill="white"></rect>
-          <rect x="307" y="44.5" width="3.4" height="9.5" rx="0.6" fill="white"></rect>
-          <rect x="312" y="42" width="3.4" height="12" rx="0.6" fill="white"></rect>
+          <rect x="297" y="49" width="3.4" height="5" rx="0.6" fill="black"></rect>
+          <rect x="302" y="47" width="3.4" height="7" rx="0.6" fill="black"></rect>
+          <rect x="307" y="44.5" width="3.4" height="9.5" rx="0.6" fill="black"></rect>
+          <rect x="312" y="42" width="3.4" height="12" rx="0.6" fill="black"></rect>
         </g>
 
         <!-- WiFi icon -->
         <g opacity="0.88">
           <path
             d="M341.382 45.8776C339.208 43.6888 336.196 42.3335 332.867 42.3335C329.528 42.3335 326.508 43.6969 324.333 45.8974L326.219 47.7831C327.911 46.0652 330.265 45.0002 332.867 45.0002C335.459 45.0002 337.805 46.057 339.496 47.7633L341.382 45.8776Z"
-            fill="white"></path>
+            fill="black"></path>
           <path
             d="M338.318 48.9418C336.928 47.5371 334.999 46.6668 332.867 46.6668C330.725 46.6668 328.788 47.5453 327.397 48.9616L329.283 50.8474C330.191 49.9136 331.462 49.3335 332.867 49.3335C334.263 49.3335 335.525 49.9053 336.432 50.8275L338.318 48.9418Z"
-            fill="white"></path>
+            fill="black"></path>
           <path
             d="M335.253 52.006C334.648 51.3855 333.803 51.0002 332.867 51.0002C331.922 51.0002 331.068 51.3938 330.462 52.0261L332.847 54.412L335.253 52.006Z"
-            fill="white"></path>
+            fill="black"></path>
         </g>
 
         <!-- Battery -->
         <g opacity="0.88">
-          <rect x="351.166" y="43.167" width="22.3333" height="10.6667" rx="2.16667" stroke="white" stroke-width="1"
+          <rect x="351.166" y="43.167" width="22.3333" height="10.6667" rx="2.16667" stroke="black" stroke-width="1"
             opacity="0.35"></rect>
-          <rect x="352.5" y="44.5" width="19.5" height="8" rx="1.2" fill="white"></rect>
+          <rect x="352.5" y="44.5" width="19.5" height="8" rx="1.2" fill="black"></rect>
           <path
             d="M374.666 47C375.402 47 375.999 47.597 375.999 48.3333V48.6667C375.999 49.403 375.402 50 374.666 50V47Z"
-            fill="white" opacity="0.4"></path>
+            fill="black" opacity="0.4"></path>
         </g>
 
         <!-- Home indicator -->
@@ -284,14 +280,19 @@
   </div>
 
     <script>
-      const APP_BASE = "/tuxcab-dispatch/";
       const PRODUCTION_URL = "https://demo.sourapps.com/tuxcab-dispatch/";
 
     function defaultAppUrl() {
       if (location.protocol === "file:") {
-        return "http://localhost:8080" + APP_BASE;
+        return "http://localhost:5173/tuxcab-dispatch/";
       }
-      return location.origin + APP_BASE;
+      if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+        return location.origin + "/tuxcab-dispatch/";
+      }
+      if (location.pathname.endsWith("preview.html")) {
+        return location.origin + location.pathname.replace(/preview\.html$/, "");
+      }
+      return PRODUCTION_URL;
     }
 
     function safeParseUrl(maybeUrl) {
