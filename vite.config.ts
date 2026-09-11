@@ -1,27 +1,47 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-/** Public URL path (trailing slash). Must match Nginx `location` and `PREVIEW_URL` in preview.html. */
-const PRODUCTION_BASE = "/tuxcab-dispatch/";
+const root = fileURLToPath(new URL(".", import.meta.url));
+
+function servePreviewHtml() {
+  const file = resolve(root, "preview.html");
+  const handle = (
+    req: { url?: string },
+    res: { setHeader: (k: string, v: string) => void; end: (b: Buffer) => void },
+    next: () => void,
+  ) => {
+    const path = (req.url ?? "").split("?")[0];
+    if (path === "/preview.html") {
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.end(readFileSync(file));
+      return;
+    }
+    next();
+  };
+
+  return {
+    name: "serve-preview-html",
+    configureServer(server: { middlewares: { use: (fn: typeof handle) => void } }) {
+      server.middlewares.use(handle);
+    },
+    configurePreviewServer(server: { middlewares: { use: (fn: typeof handle) => void } }) {
+      server.middlewares.use(handle);
+    },
+  };
+}
 
 export default defineConfig({
-  nitro: false,
+  nitro: { preset: "vercel" },
   vite: {
-    // Subpath must match Nginx and preview.html; use this for dev/preview/build so PM2 `vite preview` matches assets.
-    base: PRODUCTION_BASE,
-    // Allow the domain to access the preview server (if needed for SSR testing)
+    base: "/",
+    plugins: [servePreviewHtml()],
     server: {
-        allowedHosts: [
-            "demo.sourapps.com",
-            "localhost",
-            "127.0.0.1",
-        ],
+      allowedHosts: ["localhost", "127.0.0.1", ".vercel.app"],
     },
     preview: {
-        allowedHosts: [
-            "demo.sourapps.com",
-            "localhost",
-            "127.0.0.1",
-        ],
+      allowedHosts: ["localhost", "127.0.0.1", ".vercel.app"],
     },
   },
 });
